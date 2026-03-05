@@ -17,8 +17,9 @@ create table if not exists tag(
 
 
 create table if not exists post_tags(
-  tag_id int,
   post_id int,
+  tag_id int,
+  PRIMARY KEY (post_id, tag_id),
   CONSTRAINT fk_tag FOREIGN KEY (tag_id) REFERENCES tag(id) ON DELETE CASCADE,
   CONSTRAINT fk_post FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE);
 
