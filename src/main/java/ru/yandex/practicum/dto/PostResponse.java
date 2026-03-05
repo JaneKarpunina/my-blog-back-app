@@ -20,6 +20,10 @@ public class PostResponse {
         this.commentsCount = commentsCount;
     }
 
+    public PostResponse() {
+
+    }
+
     public int getId() {
         return id;
     }

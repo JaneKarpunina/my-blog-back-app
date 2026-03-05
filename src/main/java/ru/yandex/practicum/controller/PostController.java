@@ -34,8 +34,21 @@ public class PostController {
 //        service.deleteById(id);
 //    }
 
-//    @PutMapping("/{id}")
-//    public void update(@PathVariable(name = "id") Integer id, @RequestBody PostRequest postRequest) {
-//        postService.updatePost(id, user);
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<PostResponse> update(@PathVariable(name = "id") Integer id,
+                                               @RequestBody PostRequest postRequest) {
+
+        if (!id.equals(postRequest.getId()) || postRequest.getTitle() == null || postRequest.getText() == null ||
+                postRequest.getTags() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            PostResponse updatedPost = postService.updatePost(postRequest);
+            return ResponseEntity.ok(updatedPost);
+        }
+        catch(RuntimeException exception) {
+           return ResponseEntity.badRequest().build();
+        }
+
+    }
 }

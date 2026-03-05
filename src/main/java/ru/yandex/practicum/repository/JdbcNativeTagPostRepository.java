@@ -20,4 +20,10 @@ public class JdbcNativeTagPostRepository implements TagPostRepository{
             jdbcTemplate.update(sql, postId, tagId);
         }
     }
+
+    @Override
+    public void deleteTagsForPost(Integer postId) {
+        String sql = "DELETE FROM post_tags WHERE post_id = ?";
+        jdbcTemplate.update(sql, postId);
+    }
 }

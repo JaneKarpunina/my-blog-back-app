@@ -3,7 +3,7 @@ create table if not exists post(
   id int AUTO_INCREMENT primary key,
   title varchar(256) not null,
   text CLOB not null,
-  likesCount integer not null);
+  likes_count integer not null);
 
 create table if not exists post_comment(
   id int AUTO_INCREMENT primary key,
