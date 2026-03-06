@@ -1,5 +1,6 @@
 package ru.yandex.practicum.repository;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.KeyHolder;
@@ -13,14 +14,22 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class JdbcNativePostRepository implements PostRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public JdbcNativePostRepository(JdbcTemplate jdbcTemplate) {
+    private final TagRepository tagRepository;
+
+    private final PostCommentRepository postCommentRepository;
+
+    public JdbcNativePostRepository(JdbcTemplate jdbcTemplate, TagRepository tagRepository,
+                                    PostCommentRepository postCommentRepository) {
         this.jdbcTemplate = jdbcTemplate;
+        this.tagRepository = tagRepository;
+        this.postCommentRepository = postCommentRepository;
     }
 
     // Создать пост и вернуть его ID
@@ -83,14 +92,30 @@ public class JdbcNativePostRepository implements PostRepository {
             post.setText(rs.getString("text"));
             post.setLikesCount(rs.getInt("likesCount"));
             post.setCommentsCount(rs.getInt("commentsCount"));
-            List<String> postTags = getTagsForPost(post.getId());
+            List<String> postTags = tagRepository.getTagsForPost(post.getId());
             post.setTags(postTags);
             return post;
         }, params.toArray());
     }
 
-    private List<String> getTagsForPost(Integer postId) {
-        String sql = "SELECT t.name FROM tags t JOIN post_tags pt ON t.id = pt.tag_id WHERE pt.post_id = ?";
-        return jdbcTemplate.queryForList(sql, String.class, postId);
+    @Override
+    public Optional<PostResponse> findPostById(Integer id) {
+
+        String sql = "SELECT p.id, p.title, p.text, p.likes_count AS likesCount FROM posts p WHERE p.id = ?";
+
+        try {
+            Map<String, Object> result = jdbcTemplate.queryForMap(sql, id);
+            Integer postId = (Integer) result.get("id");
+            String title = (String) result.get("title");
+            String text = (String) result.get("text");
+            int likesCount = (int) result.get("likesCount");
+            List<String> tags = tagRepository.getTagsForPost(postId);
+            int commentsCount = postCommentRepository.countComments(postId);
+
+            return Optional.of(new PostResponse(postId, title, text, tags, likesCount, commentsCount));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+
     }
 }

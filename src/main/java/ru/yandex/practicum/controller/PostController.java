@@ -1,5 +1,6 @@
 package ru.yandex.practicum.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.PostListResponse;
@@ -8,7 +9,7 @@ import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.model.Post;
 import ru.yandex.practicum.service.PostService;
 
-import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -32,6 +33,13 @@ public class PostController {
 
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PostResponse> getPost(@PathVariable Integer id) {
+        Optional<PostResponse> postOpt = postService.findPostById(id);
+        return postOpt.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
     @PostMapping
     public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest postRequest) {
 
@@ -43,11 +51,6 @@ public class PostController {
         return ResponseEntity.ok(new PostResponse(post.getId(), post.getTitle(), post.getText(),
                 post.getTags(), post.getLikesCount(), post.getCommentsCount()));
     }
-
-//    @DeleteMapping(value = "/{id}")
-//    public void delete(@PathVariable(name = "id") Long id) {
-//        service.deleteById(id);
-//    }
 
     @PutMapping("/{id}")
     public ResponseEntity<PostResponse> update(@PathVariable(name = "id") Integer id,

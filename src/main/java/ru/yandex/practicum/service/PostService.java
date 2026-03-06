@@ -12,15 +12,13 @@ import ru.yandex.practicum.repository.PostRepository;
 import ru.yandex.practicum.repository.TagPostRepository;
 import ru.yandex.practicum.repository.TagRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class PostService {
 
+    public static final int SYMBOL_COUNT = 128;
     private final PostRepository postRepository;
 
     private final TagRepository tagRepository;
@@ -55,6 +53,7 @@ public class PostService {
                 postRequest.getTags());
     }
 
+    @Transactional
     public PostResponse updatePost(PostRequest postRequest) {
         Integer postId = postRequest.getId();
 
@@ -93,6 +92,11 @@ public class PostService {
     public PostListResponse getPosts(String search, int pageNumber, int pageSize) {
         List<PostResponse> filteredPosts = findPosts(search); // Генерируем список всех постов
 
+        for(PostResponse postResponse : filteredPosts) {
+           if (postResponse.getText().length() > SYMBOL_COUNT) {
+               postResponse.setText(postResponse.getText().substring(0, SYMBOL_COUNT) + "...");
+           }
+        }
 
         int totalPosts = filteredPosts.size();
         int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
@@ -129,5 +133,9 @@ public class PostService {
         }
 
         return postRepository.findPosts(tags, titleWords.toString().trim());
+    }
+
+    public Optional<PostResponse> findPostById(Integer id) {
+        return postRepository.findPostById(id);
     }
 }

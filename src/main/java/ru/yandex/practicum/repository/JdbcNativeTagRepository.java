@@ -39,6 +39,14 @@ public class JdbcNativeTagRepository implements TagRepository {
         return keyHolder.getKey().intValue();
     }
 
+    @Override
+    public List<String> getTagsForPost(Integer postId) {
+
+            String sql = "SELECT t.name FROM tags t JOIN post_tags pt ON t.id = pt.tag_id WHERE pt.post_id = ?";
+            return jdbcTemplate.queryForList(sql, String.class, postId);
+
+    }
+
     public Integer getOrCreateTag(String name) {
         Integer id = findTagIdByName(name);
         if (id != null) {
