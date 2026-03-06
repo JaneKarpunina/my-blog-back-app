@@ -2,10 +2,13 @@ package ru.yandex.practicum.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostRequest;
 import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.model.Post;
 import ru.yandex.practicum.service.PostService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -15,6 +18,18 @@ public class PostController {
 
     public PostController(PostService postService) {
         this.postService = postService;
+    }
+
+    @GetMapping
+    public PostListResponse getPosts(
+            @RequestParam String search,
+            @RequestParam int pageNumber,
+            @RequestParam int pageSize
+    ) {
+
+
+        return postService.getPosts(search, pageNumber, pageSize);
+
     }
 
     @PostMapping

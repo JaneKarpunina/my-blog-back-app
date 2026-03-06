@@ -3,6 +3,7 @@ package ru.yandex.practicum.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostRequest;
 import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.model.Post;
@@ -11,6 +12,8 @@ import ru.yandex.practicum.repository.PostRepository;
 import ru.yandex.practicum.repository.TagPostRepository;
 import ru.yandex.practicum.repository.TagRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -85,5 +88,46 @@ public class PostService {
         response.setTags(postRequest.getTags());
 
         return response;
+    }
+
+    public PostListResponse getPosts(String search, int pageNumber, int pageSize) {
+        List<PostResponse> filteredPosts = findPosts(search); // Генерируем список всех постов
+
+
+        int totalPosts = filteredPosts.size();
+        int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+        if (pageNumber > totalPages) {
+            pageNumber = totalPages; // если запрошена страница больше последней
+        }
+        int fromIndex = (pageNumber - 1) * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, totalPosts);
+        List<PostResponse> pagePosts = filteredPosts.subList(fromIndex, toIndex);
+
+        boolean hasPrev = pageNumber > 1;
+        boolean hasNext = pageNumber < totalPages;
+
+        return new PostListResponse(pagePosts, hasPrev, hasNext, totalPages);
+    }
+
+    private List<PostResponse> findPosts(String search) {
+
+        String[] words = search.trim().split("\\s+");
+        List<String> parsedWords = Arrays.stream(words)
+                .filter(w -> !w.isEmpty())
+                .toList();
+
+        List<String> tags = new ArrayList<>();
+        StringBuilder titleWords = new StringBuilder();
+
+        for (String word : parsedWords) {
+            if (word.startsWith("#") && word.length() > 1) {
+                tags.add(word.substring(1));
+            } else {
+                titleWords.append(word);
+                titleWords.append(" ");
+            }
+        }
+
+        return postRepository.findPosts(tags, titleWords.toString().trim());
     }
 }
