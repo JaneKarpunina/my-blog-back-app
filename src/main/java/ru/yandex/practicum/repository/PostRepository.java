@@ -20,4 +20,6 @@ public interface PostRepository {
     boolean existsById(Integer id);
 
     void deletePost(Integer postId);
+
+    Integer incrementLikes(Integer id);
 }

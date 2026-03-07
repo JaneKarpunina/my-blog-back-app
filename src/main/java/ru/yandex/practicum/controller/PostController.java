@@ -81,4 +81,14 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    @PostMapping("/{id}/likes")
+    public ResponseEntity<Integer> incrementLikes(@PathVariable Integer id) {
+        try {
+            int newLikesCount = postService.incrementLikes(id);
+            return ResponseEntity.ok(newLikesCount);
+        } catch (PostNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }

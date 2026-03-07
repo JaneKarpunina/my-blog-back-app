@@ -153,4 +153,11 @@ public class PostService {
         postCommentRepository.deleteCommentsForPost(id);
         postRepository.deletePost(id);
     }
+
+    public Integer incrementLikes(Integer id) {
+        if (!postRepository.existsById(id)) {
+            throw new PostNotFoundException("Пост не найден");
+        }
+        return postRepository.incrementLikes(id);
+    }
 }

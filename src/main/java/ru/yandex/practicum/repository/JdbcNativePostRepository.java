@@ -119,13 +119,22 @@ public class JdbcNativePostRepository implements PostRepository {
 
     }
 
+    @Override
     public boolean existsById(Integer id) {
         String sql = "SELECT COUNT(*) FROM post WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return count != null && count > 0;
     }
 
+    @Override
     public void deletePost(Integer postId) {
-        jdbcTemplate.update("DELETE FROM posts WHERE id = ?", postId);
+        jdbcTemplate.update("DELETE FROM post WHERE id = ?", postId);
+    }
+
+    @Override
+    public Integer incrementLikes(Integer id) {
+        jdbcTemplate.update("UPDATE post SET likes_count = likes_count + 1 WHERE id = ?", id);
+        return jdbcTemplate.queryForObject(
+                "SELECT likes_count FROM post WHERE id = ?", Integer.class, id);
     }
 }
