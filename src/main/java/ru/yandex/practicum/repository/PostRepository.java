@@ -16,4 +16,8 @@ public interface PostRepository {
     List<PostResponse> findPosts(List<String> tags, String titleWords);
 
     Optional<PostResponse> findPostById(Integer id);
+
+    boolean existsById(Integer id);
+
+    void deletePost(Integer postId);
 }

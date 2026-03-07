@@ -4,7 +4,7 @@ import java.util.List;
 
 public class PostListResponse {
 
-    private List<PostResponse> postResponseList;
+    private List<PostResponse> posts;
     private boolean hasPrev;
     private boolean hasNext;
     private int lastPage;
@@ -13,18 +13,18 @@ public class PostListResponse {
     }
 
     public PostListResponse(List<PostResponse> postResponseList, boolean hasPrev, boolean hasNext, int lastPage) {
-        this.postResponseList = postResponseList;
+        this.posts = postResponseList;
         this.hasPrev = hasPrev;
         this.hasNext = hasNext;
         this.lastPage = lastPage;
     }
 
-    public List<PostResponse> getPostResponseList() {
-        return postResponseList;
+    public List<PostResponse> getPosts() {
+        return posts;
     }
 
-    public void setPostResponseList(List<PostResponse> postResponseList) {
-        this.postResponseList = postResponseList;
+    public void setPosts(List<PostResponse> posts) {
+        this.posts = posts;
     }
 
     public boolean isHasPrev() {

@@ -26,7 +26,7 @@ public class JdbcNativeTagRepository implements TagRepository {
     }
 
     public Integer createTag(String name) {
-        String sql = "INSERT INTO tags (name) VALUES (?)";
+        String sql = "INSERT INTO tag (name) VALUES (?)";
 
         KeyHolder keyHolder = new org.springframework.jdbc.support.GeneratedKeyHolder();
 
@@ -42,7 +42,7 @@ public class JdbcNativeTagRepository implements TagRepository {
     @Override
     public List<String> getTagsForPost(Integer postId) {
 
-            String sql = "SELECT t.name FROM tags t JOIN post_tags pt ON t.id = pt.tag_id WHERE pt.post_id = ?";
+            String sql = "SELECT t.name FROM tag t JOIN post_tags pt ON t.id = pt.tag_id WHERE pt.post_id = ?";
             return jdbcTemplate.queryForList(sql, String.class, postId);
 
     }

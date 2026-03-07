@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostRequest;
 import ru.yandex.practicum.dto.PostResponse;
+import ru.yandex.practicum.exception.PostNotFoundException;
 import ru.yandex.practicum.model.Post;
 import ru.yandex.practicum.repository.PostCommentRepository;
 import ru.yandex.practicum.repository.PostRepository;
@@ -60,7 +61,7 @@ public class PostService {
         // Обновляем текст и название
         int rows = postRepository.updatePost(postId, postRequest.getTitle(), postRequest.getText());
         if (rows == 0) {
-            throw new RuntimeException("Пост с идентификатором: " + postId + " не найден");
+            throw new PostNotFoundException("Пост с идентификатором: " + postId + " не найден");
         }
 
         // Обновляем теги:
@@ -91,6 +92,10 @@ public class PostService {
 
     public PostListResponse getPosts(String search, int pageNumber, int pageSize) {
         List<PostResponse> filteredPosts = findPosts(search); // Генерируем список всех постов
+
+        if (filteredPosts.isEmpty()) {
+            return new PostListResponse(filteredPosts, false, false, 0);
+        }
 
         for(PostResponse postResponse : filteredPosts) {
            if (postResponse.getText().length() > SYMBOL_COUNT) {
@@ -137,5 +142,15 @@ public class PostService {
 
     public Optional<PostResponse> findPostById(Integer id) {
         return postRepository.findPostById(id);
+    }
+
+    @Transactional
+    public void deletePost(Integer id) {
+        if (!postRepository.existsById(id)) {
+            throw new PostNotFoundException("Пост с идентификатором: " + id + "не найден");
+        }
+        tagPostRepository.deleteTagsForPost(id);
+        postCommentRepository.deleteCommentsForPost(id);
+        postRepository.deletePost(id);
     }
 }

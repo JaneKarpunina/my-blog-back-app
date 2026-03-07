@@ -18,4 +18,8 @@ public class JdbcNativePostCommentRepository implements PostCommentRepository{
         String sql = "SELECT COUNT(*) FROM post_comment WHERE post_id = ?";
         return jdbcTemplate.queryForObject(sql, Integer.class, postId);
     }
+
+    public void deleteCommentsForPost(Integer postId) {
+        jdbcTemplate.update("DELETE FROM post_comment WHERE post_id = ?", postId);
+    }
 }

@@ -34,7 +34,7 @@ public class JdbcNativePostRepository implements PostRepository {
 
     // Создать пост и вернуть его ID
     public Integer savePost(String title, String text) {
-        String sql = "INSERT INTO posts (title, text, likes_count) VALUES (?, ?, 0)";
+        String sql = "INSERT INTO post (title, text, likes_count) VALUES (?, ?, 0)";
 
         KeyHolder keyHolder = new org.springframework.jdbc.support.GeneratedKeyHolder();
 
@@ -50,12 +50,12 @@ public class JdbcNativePostRepository implements PostRepository {
 
     @Override
     public Integer updatePost(Integer postId, String title, String text) {
-        String sql = "UPDATE posts SET title = ?, text = ? WHERE id = ?";
+        String sql = "UPDATE post SET title = ?, text = ? WHERE id = ?";
         return jdbcTemplate.update(sql, title, text, postId);
     }
 
     public Map<String, Object> getPostById(Integer id) {
-        String sql = "SELECT id, title, text, likes_count AS likesCount FROM posts WHERE id = ?";
+        String sql = "SELECT id, title, text, likes_count AS likesCount FROM post WHERE id = ?";
         return jdbcTemplate.queryForMap(sql, id);
     }
 
@@ -63,8 +63,8 @@ public class JdbcNativePostRepository implements PostRepository {
     public List<PostResponse> findPosts(List<String> tags,String titleWords) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT p.id, p.title, p.text, p.likes_count AS likesCount, ");
-        sql.append(" (SELECT COUNT(*) FROM post_comments pc WHERE pc.post_id = p.id) AS commentsCount ");
-        sql.append("FROM posts p ");
+        sql.append(" (SELECT COUNT(*) FROM post_comment pc WHERE pc.post_id = p.id) AS commentsCount ");
+        sql.append("FROM post p ");
 
         List<Object> params = new ArrayList<>();
         List<String> conditions = new ArrayList<>();
@@ -74,7 +74,7 @@ public class JdbcNativePostRepository implements PostRepository {
             for (String tag : tags) {
                 sql.append("JOIN post_tags pt_").append(tag.hashCode()).append(" ON p.id = pt_").append(tag.hashCode())
                         .append(".post_id AND pt_").append(tag.hashCode())
-                        .append(".tag_id = (SELECT id FROM tags t WHERE t.name = ?)");
+                        .append(".tag_id = (SELECT id FROM tag t WHERE t.name = ?)");
                 params.add(tag);
             }
         }
@@ -101,7 +101,7 @@ public class JdbcNativePostRepository implements PostRepository {
     @Override
     public Optional<PostResponse> findPostById(Integer id) {
 
-        String sql = "SELECT p.id, p.title, p.text, p.likes_count AS likesCount FROM posts p WHERE p.id = ?";
+        String sql = "SELECT p.id, p.title, p.text, p.likes_count AS likesCount FROM post p WHERE p.id = ?";
 
         try {
             Map<String, Object> result = jdbcTemplate.queryForMap(sql, id);
@@ -117,5 +117,15 @@ public class JdbcNativePostRepository implements PostRepository {
             return Optional.empty();
         }
 
+    }
+
+    public boolean existsById(Integer id) {
+        String sql = "SELECT COUNT(*) FROM post WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        return count != null && count > 0;
+    }
+
+    public void deletePost(Integer postId) {
+        jdbcTemplate.update("DELETE FROM posts WHERE id = ?", postId);
     }
 }

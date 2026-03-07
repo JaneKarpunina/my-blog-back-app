@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostRequest;
 import ru.yandex.practicum.dto.PostResponse;
+import ru.yandex.practicum.exception.PostNotFoundException;
 import ru.yandex.practicum.model.Post;
 import ru.yandex.practicum.service.PostService;
 
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/posts")
+@CrossOrigin(origins = "*")
 public class PostController {
 
     private final PostService postService;
@@ -22,14 +24,13 @@ public class PostController {
     }
 
     @GetMapping
-    public PostListResponse getPosts(
+    public ResponseEntity<PostListResponse> getPosts(
             @RequestParam String search,
-            @RequestParam int pageNumber,
-            @RequestParam int pageSize
+            @RequestParam Integer pageNumber,
+            @RequestParam Integer pageSize
     ) {
 
-
-        return postService.getPosts(search, pageNumber, pageSize);
+        return ResponseEntity.ok(postService.getPosts(search, pageNumber, pageSize));
 
     }
 
@@ -39,6 +40,8 @@ public class PostController {
         return postOpt.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+
+
 
     @PostMapping
     public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest postRequest) {
@@ -63,10 +66,19 @@ public class PostController {
         try {
             PostResponse updatedPost = postService.updatePost(postRequest);
             return ResponseEntity.ok(updatedPost);
-        }
-        catch(RuntimeException exception) {
-           return ResponseEntity.badRequest().build();
+        } catch (PostNotFoundException exception) {
+            return ResponseEntity.badRequest().build();
         }
 
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable Integer id) {
+        try {
+            postService.deletePost(id);
+            return ResponseEntity.ok().build();
+        } catch (PostNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }
