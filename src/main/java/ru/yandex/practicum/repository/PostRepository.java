@@ -22,4 +22,8 @@ public interface PostRepository {
     void deletePost(Integer postId);
 
     Integer incrementLikes(Integer id);
+
+    void updatePostImage(Integer id, String filePath);
+
+    String findImagePathById(Integer id);
 }

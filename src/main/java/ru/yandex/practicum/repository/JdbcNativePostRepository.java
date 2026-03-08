@@ -2,14 +2,11 @@ package ru.yandex.practicum.repository;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.dto.PostResponse;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,5 +133,18 @@ public class JdbcNativePostRepository implements PostRepository {
         jdbcTemplate.update("UPDATE post SET likes_count = likes_count + 1 WHERE id = ?", id);
         return jdbcTemplate.queryForObject(
                 "SELECT likes_count FROM post WHERE id = ?", Integer.class, id);
+    }
+
+    @Override
+    public void updatePostImage(Integer id, String filePath) {
+        jdbcTemplate.update(
+                "UPDATE post SET image_path = ? WHERE id = ?", filePath, id);
+
+    }
+
+    @Override
+    public String findImagePathById(Integer id) {
+        return jdbcTemplate.queryForObject(
+                "SELECT image_path FROM post WHERE id = ?", String.class, id);
     }
 }

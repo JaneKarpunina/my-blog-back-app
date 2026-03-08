@@ -1,8 +1,11 @@
 package ru.yandex.practicum.service;
 
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostRequest;
 import ru.yandex.practicum.dto.PostResponse;
@@ -13,11 +16,18 @@ import ru.yandex.practicum.repository.PostRepository;
 import ru.yandex.practicum.repository.TagPostRepository;
 import ru.yandex.practicum.repository.TagRepository;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class PostService {
+
+    private final String imagesDir = "uploads/";
 
     public static final int SYMBOL_COUNT = 128;
     private final PostRepository postRepository;
@@ -29,7 +39,7 @@ public class PostService {
     private final PostCommentRepository postCommentRepository;
 
     public PostService(PostRepository postRepository, TagRepository tagRepository,
-                       TagPostRepository tagPostRepository, PostCommentRepository postCommentRepository){
+                       TagPostRepository tagPostRepository, PostCommentRepository postCommentRepository) {
 
         this.postRepository = postRepository;
         this.tagRepository = tagRepository;
@@ -97,10 +107,10 @@ public class PostService {
             return new PostListResponse(filteredPosts, false, false, 0);
         }
 
-        for(PostResponse postResponse : filteredPosts) {
-           if (postResponse.getText().length() > SYMBOL_COUNT) {
-               postResponse.setText(postResponse.getText().substring(0, SYMBOL_COUNT) + "...");
-           }
+        for (PostResponse postResponse : filteredPosts) {
+            if (postResponse.getText().length() > SYMBOL_COUNT) {
+                postResponse.setText(postResponse.getText().substring(0, SYMBOL_COUNT) + "...");
+            }
         }
 
         int totalPosts = filteredPosts.size();
@@ -156,8 +166,42 @@ public class PostService {
 
     public Integer incrementLikes(Integer id) {
         if (!postRepository.existsById(id)) {
-            throw new PostNotFoundException("Пост не найден");
+            throw new PostNotFoundException("Пост c идентификатором: " + id + "не найден");
         }
         return postRepository.incrementLikes(id);
+    }
+
+    public void updatePostImage(Integer id, MultipartFile image) {
+        if (!postRepository.existsById(id)) {
+            throw new PostNotFoundException("Пост c идентификатором: " + id + "не найден");
+        }
+        String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
+
+        Path filePath = Paths.get(imagesDir, filename);
+        try {
+            Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException ex) {
+            throw new RuntimeException("Произошла ошибка при попытке записи в файл: " + filePath);
+        }
+
+        postRepository.updatePostImage(id, filePath.toString());
+    }
+
+    public Resource getPostImage(Integer id) {
+        String imagePath = postRepository.findImagePathById(id);
+        if (imagePath == null) {
+            return new ByteArrayResource(new byte[0]);
+        }
+        return new ByteArrayResource(getImageBytes(imagePath));
+
+    }
+
+    private byte[] getImageBytes(String imagePath) {
+        try {
+            Path path = Paths.get(imagePath);
+            return Files.readAllBytes(path);
+        } catch (IOException exception) {
+            throw new RuntimeException(exception.getMessage(), exception);
+        }
     }
 }
