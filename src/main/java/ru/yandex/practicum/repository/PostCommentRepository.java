@@ -1,5 +1,6 @@
 package ru.yandex.practicum.repository;
 
+import ru.yandex.practicum.dto.CommentRequest;
 import ru.yandex.practicum.model.PostComment;
 
 import java.util.List;
@@ -12,4 +13,6 @@ public interface PostCommentRepository {
     List<PostComment> findCommentsByPostId(int postId);
 
     PostComment findCommentsByPostIdCommentId(int commentId, int postId);
+
+    Integer createComment(CommentRequest comment);
 }

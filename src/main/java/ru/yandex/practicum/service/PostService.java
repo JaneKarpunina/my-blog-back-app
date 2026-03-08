@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 public class PostService {
 
-    private final String imagesDir = "uploads/";
+    private static final String IMAGES_DIR = "uploads/";
 
     public static final int SYMBOL_COUNT = 128;
     private final PostRepository postRepository;
@@ -100,6 +100,7 @@ public class PostService {
         return response;
     }
 
+    @Transactional
     public PostListResponse getPosts(String search, int pageNumber, int pageSize) {
         List<PostResponse> filteredPosts = findPosts(search); // Генерируем список всех постов
 
@@ -150,6 +151,7 @@ public class PostService {
         return postRepository.findPosts(tags, titleWords.toString().trim());
     }
 
+    @Transactional
     public Optional<PostResponse> findPostById(Integer id) {
         return postRepository.findPostById(id);
     }
@@ -164,6 +166,7 @@ public class PostService {
         postRepository.deletePost(id);
     }
 
+    @Transactional
     public Integer incrementLikes(Integer id) {
         if (!postRepository.existsById(id)) {
             throw new PostNotFoundException("Пост c идентификатором: " + id + "не найден");
@@ -171,13 +174,14 @@ public class PostService {
         return postRepository.incrementLikes(id);
     }
 
+    @Transactional
     public void updatePostImage(Integer id, MultipartFile image) {
         if (!postRepository.existsById(id)) {
             throw new PostNotFoundException("Пост c идентификатором: " + id + "не найден");
         }
         String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
 
-        Path filePath = Paths.get(imagesDir, filename);
+        Path filePath = Paths.get(IMAGES_DIR, filename);
         try {
             Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ex) {
@@ -187,6 +191,7 @@ public class PostService {
         postRepository.updatePostImage(id, filePath.toString());
     }
 
+    @Transactional
     public Resource getPostImage(Integer id) {
         String imagePath = postRepository.findImagePathById(id);
         if (imagePath == null) {

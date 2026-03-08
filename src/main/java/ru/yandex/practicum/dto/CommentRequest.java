@@ -1,15 +1,15 @@
 package ru.yandex.practicum.dto;
 
-public class CommentResponse {
+public class CommentRequest {
 
     private Integer id;
     private String text;
     private Integer postId;
 
-    public CommentResponse() {
+    public CommentRequest() {
     }
 
-    public CommentResponse(int id, String text, int postId) {
+    public CommentRequest(int id, String text, int postId) {
         this.text = text;
         this.id = id;
         this.postId = postId;

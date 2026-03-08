@@ -2,20 +2,20 @@ package ru.yandex.practicum.model;
 
 public class PostComment {
 
-    private int id;
+    private Integer id;
     private String text;
-    private int postId;
+    private Integer postId;
 
     public PostComment() {
     }
 
-    public PostComment(String text, int id, int postId) {
+    public PostComment(Integer id, String text, Integer postId) {
         this.text = text;
         this.id = id;
         this.postId = postId;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -31,7 +31,7 @@ public class PostComment {
         this.text = text;
     }
 
-    public int getPostId() {
+    public Integer getPostId() {
         return postId;
     }
 

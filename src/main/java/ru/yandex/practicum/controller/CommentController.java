@@ -5,7 +5,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.dto.CommentRequest;
 import ru.yandex.practicum.dto.CommentResponse;
+import ru.yandex.practicum.model.PostComment;
 import ru.yandex.practicum.service.PostCommentService;
 
 import java.util.List;
@@ -37,5 +39,19 @@ public class CommentController {
         catch(DataAccessException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    @PostMapping("/{postId}/comments")
+    public ResponseEntity<CommentResponse> addComment(
+            @PathVariable Integer postId,
+            @RequestBody CommentRequest comment
+    ) {
+        if (comment.getText() == null || comment.getPostId() == null || postId.equals(comment.getPostId())) {
+           return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        PostComment savedComment = postCommentService.saveComment(comment);
+        return ResponseEntity.ok(new CommentResponse(savedComment.getId(), savedComment.getText(),
+                savedComment.getPostId()));
     }
 }

@@ -3,6 +3,7 @@ package ru.yandex.practicum.service;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.dto.CommentRequest;
 import ru.yandex.practicum.dto.CommentResponse;
 import ru.yandex.practicum.model.PostComment;
 import ru.yandex.practicum.repository.PostCommentRepository;
@@ -36,5 +37,11 @@ public class PostCommentService {
     public CommentResponse findCommentByPostIdCommentId(int postId, int commentId) {
         PostComment postComment = postCommentRepository.findCommentsByPostIdCommentId(commentId, postId);
         return new CommentResponse(postComment.getId(), postComment.getText(), postComment.getPostId());
+    }
+
+    public PostComment saveComment(CommentRequest comment) {
+      Integer id = postCommentRepository.createComment(comment);
+
+      return new PostComment(id, comment.getText(), comment.getPostId());
     }
 }

@@ -2,10 +2,14 @@ package ru.yandex.practicum.repository;
 
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.dto.CommentRequest;
 import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.model.PostComment;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 @Repository
@@ -50,5 +54,25 @@ public class JdbcNativePostCommentRepository implements PostCommentRepository{
             return comment;
         }, commentId, postId);
 
+    }
+
+    @Override
+    public Integer createComment(CommentRequest comment) {
+        String sql = "INSERT INTO post_comment (text, post_id) VALUES (?, ?)";
+
+        KeyHolder keyHolder = new org.springframework.jdbc.support.GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, comment.getText());
+            ps.setInt(2, comment.getPostId());
+            return ps;
+        }, keyHolder);
+
+        if (keyHolder.getKey() == null) {
+           throw new RuntimeException("Не удалось сохранить в базу данных комментарий");
+        }
+
+        return keyHolder.getKey().intValue();
     }
 }

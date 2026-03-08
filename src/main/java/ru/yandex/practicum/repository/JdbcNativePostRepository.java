@@ -42,6 +42,10 @@ public class JdbcNativePostRepository implements PostRepository {
             return ps;
         }, keyHolder);
 
+        if (keyHolder.getKey() == null) {
+            throw new RuntimeException("Не удалось сохранить в базу данных комментарий");
+        }
+
         return keyHolder.getKey().intValue();
     }
 
