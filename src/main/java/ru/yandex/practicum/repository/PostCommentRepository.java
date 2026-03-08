@@ -10,4 +10,6 @@ public interface PostCommentRepository {
     void deleteCommentsForPost(Integer postId);
 
     List<PostComment> findCommentsByPostId(int postId);
+
+    PostComment findCommentsByPostIdCommentId(int commentId, int postId);
 }

@@ -29,7 +29,7 @@ public class JdbcNativePostRepository implements PostRepository {
         this.postCommentRepository = postCommentRepository;
     }
 
-    // Создать пост и вернуть его ID
+
     public Integer savePost(String title, String text) {
         String sql = "INSERT INTO post (title, text, likes_count) VALUES (?, ?, 0)";
 

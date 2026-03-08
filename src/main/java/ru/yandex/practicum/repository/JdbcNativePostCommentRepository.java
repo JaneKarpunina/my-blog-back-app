@@ -38,4 +38,17 @@ public class JdbcNativePostCommentRepository implements PostCommentRepository{
             return comment;
         }, postId);
     }
+
+    public PostComment findCommentsByPostIdCommentId(int commentId, int postId) {
+
+        String sql = "SELECT id, text, post_id FROM post_comment WHERE id = ? AND post_id = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            PostComment comment = new PostComment();
+            comment.setId(rs.getInt("id"));
+            comment.setText(rs.getString("text"));
+            comment.setPostId(rs.getInt("post_id"));
+            return comment;
+        }, commentId, postId);
+
+    }
 }
