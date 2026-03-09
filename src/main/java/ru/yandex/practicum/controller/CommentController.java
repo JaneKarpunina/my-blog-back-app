@@ -48,7 +48,7 @@ public class CommentController {
             @PathVariable Integer postId,
             @RequestBody CommentRequest comment
     ) {
-        if (comment.getText() == null || comment.getPostId() == null || postId.equals(comment.getPostId())) {
+        if (comment.getText() == null || comment.getPostId() == null || !postId.equals(comment.getPostId())) {
            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
@@ -57,13 +57,13 @@ public class CommentController {
                 savedComment.getPostId()));
     }
 
-    @GetMapping("/{postId}/comments/{commentId}")
+    @PutMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable Integer postId,
                                                          @PathVariable Integer commentId,
                                                          @RequestBody CommentRequest comment) {
 
-        if (comment.getId() == null || commentId.equals(comment.getId()) || comment.getText() == null ||
-            comment.getPostId() == null || postId.equals(comment.getPostId())) {
+        if (comment.getId() == null || !commentId.equals(comment.getId()) || comment.getText() == null ||
+            comment.getPostId() == null || !postId.equals(comment.getPostId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         try {
