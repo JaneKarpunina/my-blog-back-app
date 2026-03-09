@@ -75,4 +75,22 @@ public class JdbcNativePostCommentRepository implements PostCommentRepository{
 
         return keyHolder.getKey().intValue();
     }
+
+    @Override
+    public int updateComment(Integer id, String text, Integer postId) {
+        String sql = "UPDATE post_comment SET text = ? WHERE id = ? AND post_id = ?";
+        return jdbcTemplate.update(sql, text, id, postId);
+    }
+
+    @Override
+    public boolean existsByIdAndPostId(Integer commentId, Integer postId) {
+        String sql = "SELECT COUNT(*) FROM post_comment WHERE id = ? AND post_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, commentId, postId);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public void deleteComment(Integer commentId, Integer postId) {
+        jdbcTemplate.update("DELETE FROM post_comment WHERE id = ? AND post_id = ?", commentId, postId);
+    }
 }

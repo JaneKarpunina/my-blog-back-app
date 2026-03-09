@@ -15,4 +15,10 @@ public interface PostCommentRepository {
     PostComment findCommentsByPostIdCommentId(int commentId, int postId);
 
     Integer createComment(CommentRequest comment);
+
+    int updateComment(Integer id, String text, Integer postId);
+
+    boolean existsByIdAndPostId(Integer commentId, Integer postId);
+
+    void deleteComment(Integer commentId, Integer postId);
 }

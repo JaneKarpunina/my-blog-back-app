@@ -69,7 +69,7 @@ public class PostController {
             PostResponse updatedPost = postService.updatePost(postRequest);
             return ResponseEntity.ok(updatedPost);
         } catch (PostNotFoundException exception) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
     }
