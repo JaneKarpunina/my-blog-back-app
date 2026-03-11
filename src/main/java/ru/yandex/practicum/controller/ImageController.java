@@ -32,6 +32,10 @@ public class ImageController {
 
     @PutMapping("/{id}/image")
     public ResponseEntity<Void> updatePostImage(@PathVariable Integer id, @RequestParam("image") MultipartFile image) {
+
+        if (image.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
         try {
             postService.updatePostImage(id, image);
             return ResponseEntity.ok().build();

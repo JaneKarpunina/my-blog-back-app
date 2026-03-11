@@ -159,7 +159,7 @@ public class PostService {
     @Transactional
     public void deletePost(Integer id) {
         if (!postRepository.existsById(id)) {
-            throw new PostNotFoundException("Пост с идентификатором: " + id + "не найден");
+            throw new PostNotFoundException("Пост с идентификатором: " + id + " не найден");
         }
         tagPostRepository.deleteTagsForPost(id);
         postCommentRepository.deleteCommentsForPost(id);
@@ -169,7 +169,7 @@ public class PostService {
     @Transactional
     public Integer incrementLikes(Integer id) {
         if (!postRepository.existsById(id)) {
-            throw new PostNotFoundException("Пост c идентификатором: " + id + "не найден");
+            throw new PostNotFoundException("Пост c идентификатором: " + id + " не найден");
         }
         return postRepository.incrementLikes(id);
     }
@@ -183,6 +183,12 @@ public class PostService {
 
         Path filePath = Paths.get(IMAGES_DIR, filename);
         try {
+
+            Path uploadDir = Paths.get(IMAGES_DIR);
+            if (!Files.exists(uploadDir)) {
+                Files.createDirectories(uploadDir);
+            }
+
             Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ex) {
             throw new RuntimeException("Произошла ошибка при попытке записи в файл: " + filePath);
