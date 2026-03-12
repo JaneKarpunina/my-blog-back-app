@@ -41,6 +41,9 @@ public class ImageControllerIntegrationTest {
     void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
+        jdbcTemplate.execute("ALTER TABLE post ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.execute("ALTER TABLE tag ALTER COLUMN id RESTART WITH 1");
+
         jdbcTemplate.execute("DELETE FROM post_tags");
         jdbcTemplate.execute("DELETE FROM tag");
         jdbcTemplate.execute("DELETE FROM post");
@@ -83,6 +86,36 @@ public class ImageControllerIntegrationTest {
         int id = 999;
 
         mockMvc.perform(get("/api/posts/" + id + "/image"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void updatePostImage_EmptyFile() throws Exception {
+        int id = 1;
+        MockMultipartFile emptyFile = new MockMultipartFile(
+                "image", "empty.jpg", MediaType.IMAGE_JPEG_VALUE, new byte[0]
+        );
+
+        mockMvc.perform(
+                        multipart("/api/posts/" + id + "/image")
+                                .file(emptyFile)
+                                .with(request -> { request.setMethod("PUT"); return request; })
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void updatePostImage_PostNotFound() throws Exception {
+        int id = 999;
+        MockMultipartFile image = new MockMultipartFile(
+                "image", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "FakeImageData".getBytes()
+        );
+
+        mockMvc.perform(
+                        multipart("/api/posts/" + id + "/image")
+                                .file(image)
+                                .with(request -> { request.setMethod("PUT"); return request; })
+                )
                 .andExpect(status().isNotFound());
     }
 }

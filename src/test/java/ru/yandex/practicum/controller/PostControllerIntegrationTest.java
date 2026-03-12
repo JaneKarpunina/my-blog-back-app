@@ -44,6 +44,9 @@ class PostControllerIntegrationTest {
     void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
+        jdbcTemplate.execute("ALTER TABLE post ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.execute("ALTER TABLE tag ALTER COLUMN id RESTART WITH 1");
+
         // Чистим и наполняем БД перед каждым тестом
         jdbcTemplate.execute("DELETE FROM post_tags");
         jdbcTemplate.execute("DELETE FROM tag");
