@@ -12,8 +12,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import ru.yandex.practicum.WebConfiguration;
-import ru.yandex.practicum.configuration.DataSourceConfiguration;
 import ru.yandex.practicum.configuration.TestWebConfiguration;
 import ru.yandex.practicum.dto.PostRequest;
 
@@ -21,8 +19,6 @@ import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.hamcrest.Matchers.hasSize;
 
 @SpringJUnitConfig(classes = {
        TestWebConfiguration.class,
