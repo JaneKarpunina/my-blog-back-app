@@ -1,4 +1,4 @@
-package ru.yandex.prcticum.service;
+package ru.yandex.practicum.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,9 +17,8 @@ import ru.yandex.practicum.repository.PostCommentRepository;
 import ru.yandex.practicum.repository.PostRepository;
 import ru.yandex.practicum.repository.TagPostRepository;
 import ru.yandex.practicum.repository.TagRepository;
-import ru.yandex.practicum.service.PostService;
-import ru.yandex.prcticum.service.configuration.ParentConfiguration;
-import ru.yandex.prcticum.service.configuration.PostTestConfiguration;
+import ru.yandex.practicum.configuration.ParentConfiguration;
+import ru.yandex.practicum.configuration.PostTestConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Files;

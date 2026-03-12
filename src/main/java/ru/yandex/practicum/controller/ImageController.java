@@ -24,10 +24,16 @@ public class ImageController {
 
     @GetMapping("/{id}/image")
     public ResponseEntity<Resource> getPostImage(@PathVariable Integer id) {
-        Resource file = postService.getPostImage(id);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(file);
+        try {
+            Resource file = postService.getPostImage(id);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(file);
+        }
+        catch(PostNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
     }
 
     @PutMapping("/{id}/image")

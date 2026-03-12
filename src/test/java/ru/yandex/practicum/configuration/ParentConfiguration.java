@@ -1,4 +1,4 @@
-package ru.yandex.prcticum.service.configuration;
+package ru.yandex.practicum.configuration;
 
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;

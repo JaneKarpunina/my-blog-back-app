@@ -1,4 +1,4 @@
-package ru.yandex.prcticum.service;
+package ru.yandex.practicum.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,9 +11,8 @@ import ru.yandex.practicum.dto.CommentResponse;
 import ru.yandex.practicum.exception.PostCommentNotFoundException;
 import ru.yandex.practicum.model.PostComment;
 import ru.yandex.practicum.repository.PostCommentRepository;
-import ru.yandex.practicum.service.PostCommentService;
-import ru.yandex.prcticum.service.configuration.ParentConfiguration;
-import ru.yandex.prcticum.service.configuration.PostCommentTestConfiguration;
+import ru.yandex.practicum.configuration.ParentConfiguration;
+import ru.yandex.practicum.configuration.PostCommentTestConfiguration;
 
 import java.util.Arrays;
 import java.util.List;

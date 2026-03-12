@@ -1,9 +1,8 @@
-package ru.yandex.prcticum.service.configuration;
+package ru.yandex.practicum.configuration;
 
 
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import ru.yandex.practicum.repository.PostCommentRepository;
 import ru.yandex.practicum.repository.PostRepository;

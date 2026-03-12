@@ -199,6 +199,11 @@ public class PostService {
 
     @Transactional
     public Resource getPostImage(Integer id) {
+
+        if (!postRepository.existsById(id)) {
+            throw new PostNotFoundException("Пост с идентификатором: " + id + " не найден");
+        }
+
         String imagePath = postRepository.findImagePathById(id);
         if (imagePath == null) {
             return new ByteArrayResource(new byte[0]);
