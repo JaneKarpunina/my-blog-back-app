@@ -249,10 +249,11 @@ public class PostServiceTest {
     @Test
     void testGetPostImage_imageExists() throws IOException {
         Integer id = 1;
-        String imagePath = "test/path/image.png";
+        String imagePath = "test/image.png";
 
         byte[] imageBytes = {10, 20, 30};
         when(postRepository.findImagePathById(id)).thenReturn(imagePath);
+        when(postRepository.existsById(id)).thenReturn(true);
 
         Path path = Paths.get(imagePath);
 
@@ -269,6 +270,9 @@ public class PostServiceTest {
             assertArrayEquals(imageBytes, resultBytes);
         } finally {
             Files.deleteIfExists(path);
+            if (parentDir != null) {
+                Files.deleteIfExists(parentDir);
+            }
         }
 
         verify(postRepository).findImagePathById(id);
@@ -278,6 +282,7 @@ public class PostServiceTest {
     void testGetPostImage_imageNotFound() {
         Integer id = 2;
         when(postRepository.findImagePathById(id)).thenReturn(null);
+        when(postRepository.existsById(id)).thenReturn(true);
 
         Resource resource = postService.getPostImage(id);
 

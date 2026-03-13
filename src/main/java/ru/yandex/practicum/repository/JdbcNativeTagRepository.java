@@ -18,13 +18,14 @@ public class JdbcNativeTagRepository implements TagRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // Поиск тэга по имени
+    @Override
     public Integer findTagIdByName(String name) {
         String sql = "SELECT id FROM tag WHERE name = ?";
         List<Integer> ids = jdbcTemplate.queryForList(sql, Integer.class, name);
         return ids.isEmpty() ? null : ids.getFirst();
     }
 
+    @Override
     public Integer createTag(String name) {
         String sql = "INSERT INTO tag (name) VALUES (?)";
 
@@ -35,6 +36,10 @@ public class JdbcNativeTagRepository implements TagRepository {
             ps.setString(1, name);
             return ps;
         }, keyHolder);
+
+        if (keyHolder.getKey() == null) {
+            throw new RuntimeException("Не удалось сохранить в базу данных тэг");
+        }
 
         return keyHolder.getKey().intValue();
     }
@@ -47,6 +52,7 @@ public class JdbcNativeTagRepository implements TagRepository {
 
     }
 
+    @Override
     public Integer getOrCreateTag(String name) {
         Integer id = findTagIdByName(name);
         if (id != null) {
