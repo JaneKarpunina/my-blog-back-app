@@ -1,5 +1,6 @@
 package ru.yandex.practicum.service;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,12 +20,14 @@ import ru.yandex.practicum.repository.TagPostRepository;
 import ru.yandex.practicum.repository.TagRepository;
 import ru.yandex.practicum.configuration.ParentConfiguration;
 import ru.yandex.practicum.configuration.PostTestConfiguration;
+import ru.yandex.practicum.utils.TestUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -57,6 +60,11 @@ public class PostServiceTest {
         reset(tagRepository);
         reset(tagPostRepository);
         reset(postCommentRepository);
+    }
+
+    @AfterAll
+    public static void deleteDirectory() throws IOException {
+        TestUtils.deleteDirectory("uploads/");
     }
 
     @Test

@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.CommentRequest;
 import ru.yandex.practicum.dto.CommentResponse;
 import ru.yandex.practicum.exception.PostCommentNotFoundException;
-import ru.yandex.practicum.exception.PostNotFoundException;
 import ru.yandex.practicum.model.PostComment;
 import ru.yandex.practicum.repository.PostCommentRepository;
 

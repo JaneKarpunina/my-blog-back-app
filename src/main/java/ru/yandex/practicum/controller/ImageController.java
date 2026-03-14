@@ -9,8 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.yandex.practicum.exception.PostNotFoundException;
 import ru.yandex.practicum.service.PostService;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/api/posts")
 @CrossOrigin(origins = "*")

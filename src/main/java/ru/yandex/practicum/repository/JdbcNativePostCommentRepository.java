@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.dto.CommentRequest;
-import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.model.PostComment;
 
 import java.sql.PreparedStatement;
