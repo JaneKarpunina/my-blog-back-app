@@ -1,3 +1,5 @@
 .idea/
 target/
 uploads/
+.gradle/
+build/
