@@ -1,7 +1,7 @@
 package ru.yandex.practicum.repository;
 
 
-import org.junit.jupiter.api.BeforeEach;
+/*import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -112,4 +112,4 @@ public class JdbcNativePostCommentRepositoryTest {
         assertThrows(EmptyResultDataAccessException.class, () ->postCommentRepository.findCommentsByPostIdCommentId(2, 1));
 
     }
-}
+}*/

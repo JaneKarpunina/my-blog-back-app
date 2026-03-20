@@ -25,14 +25,14 @@ public class CommentController {
     }
 
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<List<CommentResponse>> getComments(@PathVariable int postId) {
+    public ResponseEntity<List<CommentResponse>> getComments(@PathVariable Integer postId) {
         List<CommentResponse> comments = postCommentService.findCommentsByPostId(postId);
         return ResponseEntity.ok(comments);
     }
 
     @GetMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity<CommentResponse> getComment(@PathVariable int postId,
-                                                      @PathVariable int commentId) {
+    public ResponseEntity<CommentResponse> getComment(@PathVariable Integer postId,
+                                                      @PathVariable Integer commentId) {
         try {
             CommentResponse comment = postCommentService.findCommentByPostIdCommentId(postId, commentId);
             return ResponseEntity.ok(comment);

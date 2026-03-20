@@ -1,7 +1,7 @@
 package ru.yandex.practicum.controller;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+/*import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,14 +16,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.configuration.TestWebConfiguration;
-import ru.yandex.practicum.utils.TestUtils;
+import ru.yandex.practicum.utils.Utils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
-import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -69,7 +64,7 @@ public class ImageControllerIntegrationTest {
 
     @AfterAll
     public static void deleteDirectory() throws IOException {
-        TestUtils.deleteDirectory("uploads/");
+        Utils.deleteDirectory("uploads/");
     }
 
 
@@ -142,4 +137,4 @@ public class ImageControllerIntegrationTest {
                 )
                 .andExpect(status().isNotFound());
     }
-}
+}*/

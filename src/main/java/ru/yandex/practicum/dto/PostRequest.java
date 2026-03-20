@@ -4,7 +4,7 @@ import java.util.List;
 
 public class PostRequest {
 
-    private int id;
+    private Integer id;
     private String title;
     private String text;
     private List<String> tags;

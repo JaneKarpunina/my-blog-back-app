@@ -9,7 +9,7 @@ public class CommentResponse {
     public CommentResponse() {
     }
 
-    public CommentResponse(int id, String text, int postId) {
+    public CommentResponse(Integer id, String text, Integer postId) {
         this.text = text;
         this.id = id;
         this.postId = postId;
