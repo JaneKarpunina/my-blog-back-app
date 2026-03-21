@@ -17,7 +17,7 @@ public class PostRequest {
         this.title = title;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

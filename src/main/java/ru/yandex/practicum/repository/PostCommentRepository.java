@@ -1,5 +1,6 @@
 package ru.yandex.practicum.repository;
 
+import org.springframework.data.repository.CrudRepository;
 import ru.yandex.practicum.dto.CommentRequest;
 import ru.yandex.practicum.model.PostComment;
 

@@ -3,24 +3,18 @@ package ru.yandex.practicum.service;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.ContextHierarchy;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.yandex.practicum.dto.PostRequest;
 import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.exception.PostNotFoundException;
-import ru.yandex.practicum.repository.PostCommentRepository;
 import ru.yandex.practicum.repository.PostRepository;
 import ru.yandex.practicum.repository.TagPostRepository;
 import ru.yandex.practicum.repository.TagRepository;
-import ru.yandex.practicum.configuration.ParentConfiguration;
-import ru.yandex.practicum.configuration.PostTestConfiguration;
-import ru.yandex.practicum.utils.TestUtils;
 import ru.yandex.practicum.utils.Utils;
 
 import java.io.IOException;
@@ -28,29 +22,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/*@ExtendWith(SpringExtension.class)
-@ContextHierarchy({
-        @ContextConfiguration(name = "parent", classes = ParentConfiguration.class),
-        @ContextConfiguration(name = "child", classes = PostTestConfiguration.class)
-})
-public class PostServiceTest {
+@SpringBootTest(classes = PostService.class)
+public class PostServiceTest extends BaseTest {
 
-    @Autowired
+    @MockitoBean
     private PostRepository postRepository;
 
-    @Autowired
+    @MockitoBean
     private TagRepository tagRepository;
 
-    @Autowired
+    @MockitoBean
     private TagPostRepository tagPostRepository;
-
-    @Autowired
-    private PostCommentRepository postCommentRepository;
 
     @Autowired
     private PostService postService;
@@ -300,4 +286,4 @@ public class PostServiceTest {
 
         verify(postRepository).findImagePathById(id);
     }
-}*/
+}

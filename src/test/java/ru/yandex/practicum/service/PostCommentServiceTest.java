@@ -1,18 +1,12 @@
 package ru.yandex.practicum.service;
 
-/*import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.ContextHierarchy;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.dto.CommentRequest;
 import ru.yandex.practicum.dto.CommentResponse;
 import ru.yandex.practicum.exception.PostCommentNotFoundException;
 import ru.yandex.practicum.model.PostComment;
-import ru.yandex.practicum.repository.PostCommentRepository;
-import ru.yandex.practicum.configuration.ParentConfiguration;
-import ru.yandex.practicum.configuration.PostCommentTestConfiguration;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,16 +14,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-
-@ExtendWith(SpringExtension.class)
-@ContextHierarchy({
-        @ContextConfiguration(name = "parent", classes = ParentConfiguration.class),
-        @ContextConfiguration(name = "child", classes = PostCommentTestConfiguration.class)
-})
-public class PostCommentServiceTest {
-
-    @Autowired
-    PostCommentRepository postCommentRepository;
+@SpringBootTest(classes = PostCommentService.class)
+public class PostCommentServiceTest extends BaseTest {
 
     @Autowired
     PostCommentService postCommentService;
@@ -171,4 +157,4 @@ public class PostCommentServiceTest {
     }
 
 
-}*/
+}

@@ -1,13 +1,12 @@
 package ru.yandex.practicum.repository;
 
 
-/*import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import ru.yandex.practicum.configuration.DataSourceConfiguration;
+import ru.yandex.practicum.configuration.TestConfig;
 
 import java.util.List;
 import java.util.Map;
@@ -15,8 +14,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringJUnitConfig(classes = {DataSourceConfiguration.class, JdbcNativeTagPostRepository.class})
-@TestPropertySource(locations = "classpath:test-application.properties")
+@SpringBootTest(classes = {TestConfig.class, JdbcNativeTagPostRepository.class})
 public class JdbcNativeTagPostRepositoryTest {
 
     @Autowired
@@ -72,4 +70,4 @@ public class JdbcNativeTagPostRepositoryTest {
 
     }
 
-}*/
+}
