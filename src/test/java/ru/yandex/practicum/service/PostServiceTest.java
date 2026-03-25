@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -19,11 +20,16 @@ import ru.yandex.practicum.repository.TagPostRepository;
 import ru.yandex.practicum.repository.TagRepository;
 import ru.yandex.practicum.utils.Utils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -43,6 +49,9 @@ public class PostServiceTest extends BaseTest {
     @Autowired
     private PostService postService;
 
+    @Value("classpath:100MB.txt")
+    private Resource largeFile;
+
     @BeforeEach
     void resetMocks() {
         reset(postRepository);
@@ -58,10 +67,11 @@ public class PostServiceTest extends BaseTest {
 
     @Test
     void testCreatePost() {
-        PostRequest postRequest = new PostRequest();
+        createPostWithText("abc");
+    }
 
+    private void createPostTest(PostRequest postRequest) {
         postRequest.setTitle("title");
-        postRequest.setText("abc");
         postRequest.setTags(Arrays.asList("tag1", "tag2"));
 
 
@@ -92,6 +102,31 @@ public class PostServiceTest extends BaseTest {
 
         verify(postRepository, times(1)).savePost(any(), any());
         verify(tagPostRepository, times(1)).addTagsToPost(any(), any());
+    }
+
+    @Test
+    void testCreatePost_large_text() throws IOException {
+        createPostWithText(readResourceAsString(largeFile));
+    }
+
+    private String readResourceAsString(Resource resource) throws IOException {
+        try (InputStream inputStream = resource.getInputStream()) {
+            return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining(System.lineSeparator()));
+        }
+    }
+
+    @Test
+    void testCreatePost_special_characters() {
+        createPostWithText("£$%");
+    }
+
+    private void createPostWithText(String text) {
+        PostRequest postRequest = new PostRequest();
+        postRequest.setText(text);
+
+        createPostTest(postRequest);
     }
 
     @Test
