@@ -64,12 +64,15 @@ public class ImageControllerIntegrationTest {
     @Test
     void uploadAndDownloadImage_success() throws Exception {
         int id = 1;
-        byte[] stub = "FakeImageData".getBytes();
+        byte[] jpegBytes = new byte[] {
+                (byte)0xFF, (byte)0xD8, // SOI (Start of Image)
+                (byte)0xFF, (byte)0xD9 // EOI (End of Image)
+        };;
         MockMultipartFile image = new MockMultipartFile(
                 "image",
                 "test.jpg",
                 MediaType.IMAGE_JPEG_VALUE,
-                stub
+                jpegBytes
         );
 
         mockMvc.perform(
@@ -84,7 +87,7 @@ public class ImageControllerIntegrationTest {
         mockMvc.perform(get("/api/posts/" + id + "/image"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
-                .andExpect(content().bytes(stub));
+                .andExpect(content().bytes(jpegBytes));
     }
 
     @Test

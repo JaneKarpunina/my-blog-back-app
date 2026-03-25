@@ -14,7 +14,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/posts")
-@CrossOrigin(origins = "*")
 public class PostController {
 
     private final PostService postService;
@@ -64,32 +63,26 @@ public class PostController {
                 postRequest.getTags() == null) {
             return ResponseEntity.badRequest().build();
         }
-        try {
-            PostResponse updatedPost = postService.updatePost(postRequest);
-            return ResponseEntity.ok(updatedPost);
-        } catch (PostNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+
+        PostResponse updatedPost = postService.updatePost(postRequest);
+        return ResponseEntity.ok(updatedPost);
+
 
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Integer id) {
-        try {
-            postService.deletePost(id);
-            return ResponseEntity.ok().build();
-        } catch (PostNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+
+        postService.deletePost(id);
+        return ResponseEntity.ok().build();
+
     }
 
     @PostMapping("/{id}/likes")
     public ResponseEntity<Integer> incrementLikes(@PathVariable Integer id) {
-        try {
-            int newLikesCount = postService.incrementLikes(id);
-            return ResponseEntity.ok(newLikesCount);
-        } catch (PostNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+
+        int newLikesCount = postService.incrementLikes(id);
+        return ResponseEntity.ok(newLikesCount);
+
     }
 }

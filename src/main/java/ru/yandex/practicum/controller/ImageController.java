@@ -6,12 +6,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.yandex.practicum.exception.PostNotFoundException;
 import ru.yandex.practicum.service.PostService;
 
 @RestController
 @RequestMapping("/api/posts")
-@CrossOrigin(origins = "*")
 public class ImageController {
 
     private final PostService postService;
@@ -22,15 +20,11 @@ public class ImageController {
 
     @GetMapping("/{id}/image")
     public ResponseEntity<Resource> getPostImage(@PathVariable Integer id) {
-        try {
-            Resource file = postService.getPostImage(id);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(file);
-        }
-        catch(PostNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+
+        Resource file = postService.getPostImage(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(file);
 
     }
 
@@ -40,15 +34,10 @@ public class ImageController {
         if (image.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        try {
-            postService.updatePostImage(id, image);
-            return ResponseEntity.ok().build();
-        } catch (PostNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        postService.updatePostImage(id, image);
+        return ResponseEntity.ok().build();
+
     }
-
-
 
 
 }

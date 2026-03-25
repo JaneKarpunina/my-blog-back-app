@@ -4,14 +4,14 @@ import java.util.List;
 
 public class PostResponse {
 
-    private int id;
+    private Integer id;
     private String title;
     private String text;
     private List<String> tags;
     private int likesCount;
     private int commentsCount;
 
-    public PostResponse(int id, String title, String text, List<String> tags, int likesCount, int commentsCount) {
+    public PostResponse(Integer id, String title, String text, List<String> tags, int likesCount, int commentsCount) {
         this.id = id;
         this.title = title;
         this.text = text;
@@ -28,7 +28,7 @@ public class PostResponse {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

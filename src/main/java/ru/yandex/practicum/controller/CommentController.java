@@ -1,13 +1,11 @@
 package ru.yandex.practicum.controller;
 
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.CommentRequest;
 import ru.yandex.practicum.dto.CommentResponse;
-import ru.yandex.practicum.exception.PostCommentNotFoundException;
 import ru.yandex.practicum.model.PostComment;
 import ru.yandex.practicum.service.PostCommentService;
 
@@ -15,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
-@CrossOrigin(origins = "*")
 public class CommentController {
 
     private final PostCommentService postCommentService;
@@ -33,13 +30,8 @@ public class CommentController {
     @GetMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<CommentResponse> getComment(@PathVariable Integer postId,
                                                       @PathVariable Integer commentId) {
-        try {
-            CommentResponse comment = postCommentService.findCommentByPostIdCommentId(postId, commentId);
-            return ResponseEntity.ok(comment);
-        }
-        catch(DataAccessException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        CommentResponse comment = postCommentService.findCommentByPostIdCommentId(postId, commentId);
+        return ResponseEntity.ok(comment);
     }
 
     @PostMapping("/{postId}/comments")
@@ -48,7 +40,7 @@ public class CommentController {
             @RequestBody CommentRequest comment
     ) {
         if (comment.getText() == null || comment.getPostId() == null || !postId.equals(comment.getPostId())) {
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         PostComment savedComment = postCommentService.saveComment(comment);
@@ -62,26 +54,22 @@ public class CommentController {
                                                          @RequestBody CommentRequest comment) {
 
         if (comment.getId() == null || !commentId.equals(comment.getId()) || comment.getText() == null ||
-            comment.getPostId() == null || !postId.equals(comment.getPostId())) {
+                comment.getPostId() == null || !postId.equals(comment.getPostId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        try {
-            PostComment postComment = postCommentService.updateComment(comment);
-            return ResponseEntity.ok(new CommentResponse(postComment.getId(), postComment.getText(),
-                    postComment.getPostId()));
-        }
-        catch(PostCommentNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+
+        PostComment postComment = postCommentService.updateComment(comment);
+        return ResponseEntity.ok(new CommentResponse(postComment.getId(), postComment.getText(),
+                postComment.getPostId()));
+
+
     }
 
     @DeleteMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Integer postId, @PathVariable Integer commentId) {
-        try {
-            postCommentService.deleteComment(postId, commentId);
-            return ResponseEntity.ok().build();
-        } catch (PostCommentNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+
+        postCommentService.deleteComment(postId, commentId);
+        return ResponseEntity.ok().build();
+
     }
 }

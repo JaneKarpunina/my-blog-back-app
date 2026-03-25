@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.yandex.practicum.dto.PostRequest;
 import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.exception.PostNotFoundException;
+import ru.yandex.practicum.exception.UnsupportedMediaTypeException;
 import ru.yandex.practicum.repository.PostRepository;
 import ru.yandex.practicum.repository.TagPostRepository;
 import ru.yandex.practicum.repository.TagRepository;
@@ -76,6 +78,23 @@ public class PostServiceTest extends BaseTest {
     }
 
     @Test
+    void testCreatePost_emptyTags() {
+        PostRequest postRequest = new PostRequest();
+
+        postRequest.setTitle("title");
+        postRequest.setText("abc");
+        postRequest.setTags(List.of());
+
+        when(postRepository.savePost(postRequest.getTitle(), postRequest.getText())).thenReturn(1);
+        doNothing().when(tagPostRepository).addTagsToPost(any(), any());
+
+        postService.createPost(postRequest);
+
+        verify(postRepository, times(1)).savePost(any(), any());
+        verify(tagPostRepository, times(1)).addTagsToPost(any(), any());
+    }
+
+    @Test
     void testUpdatePost_success() {
 
         PostRequest postRequest = new PostRequest();
@@ -102,6 +121,37 @@ public class PostServiceTest extends BaseTest {
         verify(postRepository, times(1)).updatePost(any(), any(), any());
         verify(tagPostRepository, times(1)).deleteTagsForPost(any());
         verify(tagRepository, times(2)).getOrCreateTag(any());
+        verify(tagPostRepository, times(1)).addTagsToPost(any(), any());
+
+        verify(postRepository, times(1)).getPostById(any());
+        verify(postCommentRepository, times(1)).countComments(any());
+
+
+    }
+
+    @Test
+    void testUpdatePost_empty_tags() {
+
+        PostRequest postRequest = new PostRequest();
+        postRequest.setId(1);
+        postRequest.setTitle("title");
+        postRequest.setText("abc");
+        postRequest.setTags(List.of());
+
+        Map<String, Object> updatedFields = new HashMap<>();
+        updatedFields.put("likesCount", 0);
+
+        when(postRepository.updatePost(postRequest.getId(), postRequest.getTitle(),
+                postRequest.getText())).thenReturn(1);
+        doNothing().when(tagPostRepository).deleteTagsForPost(any());
+        when(postRepository.getPostById(1)).thenReturn(updatedFields);
+        when(postCommentRepository.countComments(1)).thenReturn(1);
+
+        postService.updatePost(postRequest);
+
+
+        verify(postRepository, times(1)).updatePost(any(), any(), any());
+        verify(tagPostRepository, times(1)).deleteTagsForPost(any());
         verify(tagPostRepository, times(1)).addTagsToPost(any(), any());
 
         verify(postRepository, times(1)).getPostById(any());
@@ -215,7 +265,15 @@ public class PostServiceTest extends BaseTest {
     void testUpdatePostImage_success() {
 
         Integer id = 1;
-        MockMultipartFile image = new MockMultipartFile("image", new byte[]{1, 2, 3});
+
+        byte[] jpegBytes = new byte[] {
+                (byte)0xFF, (byte)0xD8, // SOI (Start of Image)
+                (byte)0xFF, (byte)0xD9 // EOI (End of Image)
+        };
+        MockMultipartFile image = new MockMultipartFile("imgUrl",
+                "image-file.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                jpegBytes);
 
         when(postRepository.existsById(id)).thenReturn(true);
 
@@ -223,6 +281,25 @@ public class PostServiceTest extends BaseTest {
 
         verify(postRepository).existsById(id);
         verify(postRepository).updatePostImage(eq(id), anyString());
+
+    }
+
+    @Test
+    void testUpdatePostImage_wrong_type() {
+
+        Integer id = 1;
+
+        MockMultipartFile image = new MockMultipartFile("imgUrl",
+                "image-file.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "some text".getBytes());
+
+        when(postRepository.existsById(id)).thenReturn(true);
+
+        assertThrows(UnsupportedMediaTypeException.class,
+                () -> postService.updatePostImage(id, image));
+
+        verify(postRepository).existsById(id);
 
     }
 
