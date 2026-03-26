@@ -119,7 +119,7 @@ public class PostServiceTest extends BaseTest {
 
     @Test
     void testCreatePost_special_characters() {
-        createPostWithText("£$%");
+        createPostWithText("£$%#");
     }
 
     private void createPostWithText(String text) {

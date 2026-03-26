@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostRequest;
 import ru.yandex.practicum.dto.PostResponse;
-import ru.yandex.practicum.exception.PostNotFoundException;
 import ru.yandex.practicum.model.Post;
 import ru.yandex.practicum.service.PostService;
 
