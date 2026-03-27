@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Post {
 
-    private int id;
+    private Integer id;
     private String title;
     private String text;
     private int likesCount;
@@ -13,7 +13,7 @@ public class Post {
 
     public Post() {}
 
-    public Post(int id, String title, String text, int likesCount, int commentsCount, List<String> tags) {
+    public Post(Integer id, String title, String text, int likesCount, int commentsCount, List<String> tags) {
         this.title = title;
         this.text = text;
         this.likesCount = likesCount;
@@ -26,7 +26,7 @@ public class Post {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

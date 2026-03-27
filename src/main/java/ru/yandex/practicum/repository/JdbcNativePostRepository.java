@@ -8,10 +8,7 @@ import ru.yandex.practicum.dto.PostResponse;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class JdbcNativePostRepository implements PostRepository {
@@ -64,37 +61,47 @@ public class JdbcNativePostRepository implements PostRepository {
     public List<PostResponse> findPosts(List<String> tags,String titleWords) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT p.id, p.title, p.text, p.likes_count AS likesCount, ");
-        sql.append(" (SELECT COUNT(*) FROM post_comment pc WHERE pc.post_id = p.id) AS commentsCount ");
+        sql.append(" (SELECT COUNT(*) FROM post_comment pc WHERE pc.post_id = p.id) AS commentsCount, ");
+        sql.append("GROUP_CONCAT(tag.name SEPARATOR ', ') AS tags ");
         sql.append("FROM post p ");
+        sql.append("LEFT JOIN post_tags pt ON p.id = pt.post_id ");
+        sql.append("LEFT JOIN tag ON pt.tag_id = tag.id ");
 
         List<Object> params = new ArrayList<>();
-        List<String> conditions = new ArrayList<>();
 
         if (!tags.isEmpty()) {
             // Для тегов — нужно убедиться, что у поста есть все указанные теги
+            int index = 0;
             for (String tag : tags) {
-                sql.append("JOIN post_tags pt_").append(tag.hashCode()).append(" ON p.id = pt_").append(tag.hashCode())
-                        .append(".post_id AND pt_").append(tag.hashCode())
+                sql.append("JOIN post_tags pt_").append(index).append(" ON p.id = pt_").append(index)
+                        .append(".post_id AND pt_").append(index)
                         .append(".tag_id = (SELECT id FROM tag t WHERE t.name = ?)");
                 params.add(tag);
+                index++;
             }
         }
 
         if (!titleWords.isEmpty()) {
-                sql.append("WHERE p.title LIKE ?");
+                sql.append(" WHERE p.title LIKE ?");
                 params.add("%" + titleWords + "%");
         }
 
+        sql.append(" GROUP BY p.id");
+
         // Выполняем запрос
-        return jdbcTemplate.query(sql.toString(), (rs, rowNum) -> {
+            return jdbcTemplate.query(sql.toString(), (rs, rowNum) -> {
             PostResponse post = new PostResponse();
             post.setId(rs.getInt("id"));
             post.setTitle(rs.getString("title"));
             post.setText(rs.getString("text"));
             post.setLikesCount(rs.getInt("likesCount"));
             post.setCommentsCount(rs.getInt("commentsCount"));
-            List<String> postTags = tagRepository.getTagsForPost(post.getId());
-            post.setTags(postTags);
+            String tagsString = rs.getString("tags");
+            if (tagsString != null && !tagsString.isEmpty()) {
+                post.setTags(List.of(tagsString.split(", ")));
+            } else {
+                post.setTags(Collections.emptyList());
+            }
             return post;
         }, params.toArray());
     }

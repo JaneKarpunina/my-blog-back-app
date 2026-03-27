@@ -4,7 +4,7 @@ import java.util.List;
 
 public class PostRequest {
 
-    private int id;
+    private Integer id;
     private String title;
     private String text;
     private List<String> tags;
@@ -17,11 +17,11 @@ public class PostRequest {
         this.title = title;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

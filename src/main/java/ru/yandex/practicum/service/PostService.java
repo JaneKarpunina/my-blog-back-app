@@ -1,6 +1,7 @@
 package ru.yandex.practicum.service;
 
 
+import org.apache.tika.Tika;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import ru.yandex.practicum.dto.PostListResponse;
 import ru.yandex.practicum.dto.PostRequest;
 import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.exception.PostNotFoundException;
+import ru.yandex.practicum.exception.UnsupportedMediaTypeException;
 import ru.yandex.practicum.model.Post;
 import ru.yandex.practicum.repository.PostCommentRepository;
 import ru.yandex.practicum.repository.PostRepository;
@@ -179,22 +181,35 @@ public class PostService {
         if (!postRepository.existsById(id)) {
             throw new PostNotFoundException("Пост c идентификатором: " + id + "не найден");
         }
-        String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
 
-        Path filePath = Paths.get(IMAGES_DIR, filename);
         try {
 
+            checkFile(image);
+            String filename = UUID.randomUUID() + "_" + image.getOriginalFilename();
+
+            Path filePath = Paths.get(IMAGES_DIR, filename);
             Path uploadDir = Paths.get(IMAGES_DIR);
             if (!Files.exists(uploadDir)) {
                 Files.createDirectories(uploadDir);
             }
 
             Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            postRepository.updatePostImage(id, filePath.toString());
+
         } catch (IOException ex) {
-            throw new RuntimeException("Произошла ошибка при попытке записи в файл: " + filePath);
+            throw new RuntimeException("Произошла ошибка при попытке записи в файл");
         }
 
-        postRepository.updatePostImage(id, filePath.toString());
+
+    }
+
+    private static void checkFile(MultipartFile image) throws IOException {
+        String detectedType = new Tika().detect(image.getBytes());
+        if (!detectedType.startsWith("image/")) {
+            throw new UnsupportedMediaTypeException("Поддерживаются только типы image/");
+        }
+
     }
 
     @Transactional

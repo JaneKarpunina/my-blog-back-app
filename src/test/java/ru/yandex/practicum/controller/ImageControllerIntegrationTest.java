@@ -6,49 +6,37 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import ru.yandex.practicum.configuration.TestWebConfiguration;
-import ru.yandex.practicum.utils.TestUtils;
+import ru.yandex.practicum.utils.Utils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
-import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringJUnitConfig(classes = {
-        TestWebConfiguration.class,
-})
-@WebAppConfiguration
-@TestPropertySource(locations = "classpath:test-application.properties")
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK
+)
+@AutoConfigureMockMvc
 public class ImageControllerIntegrationTest {
 
     @Autowired
-    private WebApplicationContext wac;
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
         jdbcTemplate.execute("ALTER TABLE post ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.execute("ALTER TABLE tag ALTER COLUMN id RESTART WITH 1");
@@ -69,19 +57,22 @@ public class ImageControllerIntegrationTest {
 
     @AfterAll
     public static void deleteDirectory() throws IOException {
-        TestUtils.deleteDirectory("uploads/");
+        Utils.deleteDirectory("uploads/");
     }
 
 
     @Test
     void uploadAndDownloadImage_success() throws Exception {
         int id = 1;
-        byte[] stub = "FakeImageData".getBytes();
+        byte[] jpegBytes = new byte[] {
+                (byte)0xFF, (byte)0xD8, // SOI (Start of Image)
+                (byte)0xFF, (byte)0xD9 // EOI (End of Image)
+        };;
         MockMultipartFile image = new MockMultipartFile(
                 "image",
                 "test.jpg",
                 MediaType.IMAGE_JPEG_VALUE,
-                stub
+                jpegBytes
         );
 
         mockMvc.perform(
@@ -96,7 +87,7 @@ public class ImageControllerIntegrationTest {
         mockMvc.perform(get("/api/posts/" + id + "/image"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
-                .andExpect(content().bytes(stub));
+                .andExpect(content().bytes(jpegBytes));
     }
 
     @Test

@@ -4,11 +4,10 @@ package ru.yandex.practicum.repository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import ru.yandex.practicum.configuration.DataSourceConfiguration;
+import ru.yandex.practicum.configuration.TestConfig;
 import ru.yandex.practicum.dto.CommentRequest;
 import ru.yandex.practicum.model.PostComment;
 
@@ -16,8 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitConfig(classes = {DataSourceConfiguration.class, JdbcNativePostCommentRepository.class})
-@TestPropertySource(locations = "classpath:test-application.properties")
+@SpringBootTest(classes = {TestConfig.class, JdbcNativePostCommentRepository.class })
 public class JdbcNativePostCommentRepositoryTest {
 
     @Autowired

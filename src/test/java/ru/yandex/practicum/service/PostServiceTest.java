@@ -3,56 +3,54 @@ package ru.yandex.practicum.service;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.ContextHierarchy;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.yandex.practicum.dto.PostRequest;
 import ru.yandex.practicum.dto.PostResponse;
 import ru.yandex.practicum.exception.PostNotFoundException;
-import ru.yandex.practicum.repository.PostCommentRepository;
+import ru.yandex.practicum.exception.UnsupportedMediaTypeException;
 import ru.yandex.practicum.repository.PostRepository;
 import ru.yandex.practicum.repository.TagPostRepository;
 import ru.yandex.practicum.repository.TagRepository;
-import ru.yandex.practicum.configuration.ParentConfiguration;
-import ru.yandex.practicum.configuration.PostTestConfiguration;
-import ru.yandex.practicum.utils.TestUtils;
+import ru.yandex.practicum.utils.Utils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextHierarchy({
-        @ContextConfiguration(name = "parent", classes = ParentConfiguration.class),
-        @ContextConfiguration(name = "child", classes = PostTestConfiguration.class)
-})
-public class PostServiceTest {
+@SpringBootTest(classes = PostService.class)
+public class PostServiceTest extends BaseTest {
 
-    @Autowired
+    @MockitoBean
     private PostRepository postRepository;
 
-    @Autowired
+    @MockitoBean
     private TagRepository tagRepository;
 
-    @Autowired
+    @MockitoBean
     private TagPostRepository tagPostRepository;
 
     @Autowired
-    private PostCommentRepository postCommentRepository;
-
-    @Autowired
     private PostService postService;
+
+    @Value("classpath:100MB.txt")
+    private Resource largeFile;
 
     @BeforeEach
     void resetMocks() {
@@ -64,15 +62,16 @@ public class PostServiceTest {
 
     @AfterAll
     public static void deleteDirectory() throws IOException {
-        TestUtils.deleteDirectory("uploads/");
+        Utils.deleteDirectory("uploads/");
     }
 
     @Test
     void testCreatePost() {
-        PostRequest postRequest = new PostRequest();
+        createPostWithText("abc");
+    }
 
+    private void createPostTest(PostRequest postRequest) {
         postRequest.setTitle("title");
-        postRequest.setText("abc");
         postRequest.setTags(Arrays.asList("tag1", "tag2"));
 
 
@@ -86,6 +85,48 @@ public class PostServiceTest {
         verify(postRepository, times(1)).savePost(any(), any());
         verify(tagRepository, times(2)).getOrCreateTag(any());
         verify(tagPostRepository, times(1)).addTagsToPost(any(), any());
+    }
+
+    @Test
+    void testCreatePost_emptyTags() {
+        PostRequest postRequest = new PostRequest();
+
+        postRequest.setTitle("title");
+        postRequest.setText("abc");
+        postRequest.setTags(List.of());
+
+        when(postRepository.savePost(postRequest.getTitle(), postRequest.getText())).thenReturn(1);
+        doNothing().when(tagPostRepository).addTagsToPost(any(), any());
+
+        postService.createPost(postRequest);
+
+        verify(postRepository, times(1)).savePost(any(), any());
+        verify(tagPostRepository, times(1)).addTagsToPost(any(), any());
+    }
+
+    @Test
+    void testCreatePost_large_text() throws IOException {
+        createPostWithText(readResourceAsString(largeFile));
+    }
+
+    private String readResourceAsString(Resource resource) throws IOException {
+        try (InputStream inputStream = resource.getInputStream()) {
+            return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining(System.lineSeparator()));
+        }
+    }
+
+    @Test
+    void testCreatePost_special_characters() {
+        createPostWithText("£$%#");
+    }
+
+    private void createPostWithText(String text) {
+        PostRequest postRequest = new PostRequest();
+        postRequest.setText(text);
+
+        createPostTest(postRequest);
     }
 
     @Test
@@ -115,6 +156,37 @@ public class PostServiceTest {
         verify(postRepository, times(1)).updatePost(any(), any(), any());
         verify(tagPostRepository, times(1)).deleteTagsForPost(any());
         verify(tagRepository, times(2)).getOrCreateTag(any());
+        verify(tagPostRepository, times(1)).addTagsToPost(any(), any());
+
+        verify(postRepository, times(1)).getPostById(any());
+        verify(postCommentRepository, times(1)).countComments(any());
+
+
+    }
+
+    @Test
+    void testUpdatePost_empty_tags() {
+
+        PostRequest postRequest = new PostRequest();
+        postRequest.setId(1);
+        postRequest.setTitle("title");
+        postRequest.setText("abc");
+        postRequest.setTags(List.of());
+
+        Map<String, Object> updatedFields = new HashMap<>();
+        updatedFields.put("likesCount", 0);
+
+        when(postRepository.updatePost(postRequest.getId(), postRequest.getTitle(),
+                postRequest.getText())).thenReturn(1);
+        doNothing().when(tagPostRepository).deleteTagsForPost(any());
+        when(postRepository.getPostById(1)).thenReturn(updatedFields);
+        when(postCommentRepository.countComments(1)).thenReturn(1);
+
+        postService.updatePost(postRequest);
+
+
+        verify(postRepository, times(1)).updatePost(any(), any(), any());
+        verify(tagPostRepository, times(1)).deleteTagsForPost(any());
         verify(tagPostRepository, times(1)).addTagsToPost(any(), any());
 
         verify(postRepository, times(1)).getPostById(any());
@@ -228,7 +300,15 @@ public class PostServiceTest {
     void testUpdatePostImage_success() {
 
         Integer id = 1;
-        MockMultipartFile image = new MockMultipartFile("image", new byte[]{1, 2, 3});
+
+        byte[] jpegBytes = new byte[] {
+                (byte)0xFF, (byte)0xD8, // SOI (Start of Image)
+                (byte)0xFF, (byte)0xD9 // EOI (End of Image)
+        };
+        MockMultipartFile image = new MockMultipartFile("imgUrl",
+                "image-file.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                jpegBytes);
 
         when(postRepository.existsById(id)).thenReturn(true);
 
@@ -236,6 +316,25 @@ public class PostServiceTest {
 
         verify(postRepository).existsById(id);
         verify(postRepository).updatePostImage(eq(id), anyString());
+
+    }
+
+    @Test
+    void testUpdatePostImage_wrong_type() {
+
+        Integer id = 1;
+
+        MockMultipartFile image = new MockMultipartFile("imgUrl",
+                "image-file.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "some text".getBytes());
+
+        when(postRepository.existsById(id)).thenReturn(true);
+
+        assertThrows(UnsupportedMediaTypeException.class,
+                () -> postService.updatePostImage(id, image));
+
+        verify(postRepository).existsById(id);
 
     }
 

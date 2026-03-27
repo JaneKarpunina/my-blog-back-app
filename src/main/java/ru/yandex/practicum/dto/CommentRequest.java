@@ -9,7 +9,7 @@ public class CommentRequest {
     public CommentRequest() {
     }
 
-    public CommentRequest(int id, String text, int postId) {
+    public CommentRequest(Integer id, String text, Integer postId) {
         this.text = text;
         this.id = id;
         this.postId = postId;
@@ -19,7 +19,7 @@ public class CommentRequest {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
